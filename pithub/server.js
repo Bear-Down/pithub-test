@@ -22,6 +22,11 @@ app.get('*', (req, res) => {
   }
 });
 
+app.get("/ping", (req, res) => {
+    console.log("Ping Request Received");
+    res.json("PitHub Server is up and running");
+});
+
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on port ${port}`);
 });
