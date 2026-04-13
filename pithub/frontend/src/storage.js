@@ -1,5 +1,5 @@
 import { ref, listAll, getDownloadURL } from "firebase/storage";
-import { storage } from "../backend/firebase.js";
+import { storage } from "../../firebase.js"; // Path adjusted for frontend/src/ location
 
 /**
  * Fetches file metadata and download URLs from Firebase Storage.
