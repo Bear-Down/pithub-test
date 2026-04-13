@@ -10,8 +10,16 @@ const port = process.env.PORT || 8080;
 
 app.use(express.static(path.join(__dirname, 'dist')));
 
+// Single Page Application (SPA) Catch-all
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  // If the request contains a dot (e.g., .js, .html, .png) and reached here,
+  // it means express.static didn't find it in the dist folder.
+  // We should return a 404 instead of serving index.html to avoid confusing behavior.
+  if (req.path.includes('.')) {
+    res.status(404).send('Not Found');
+  } else {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  }
 });
 
 app.listen(port, '0.0.0.0', () => {
