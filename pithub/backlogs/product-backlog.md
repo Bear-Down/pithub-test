@@ -11,7 +11,6 @@ Scrum Master: Erick Hernandez
 
 | **ID** | **User Story / Task** | **Priority (1-10)** | **Estimate (SP)** | **Spike (Y/N)** | **Status** | **Assigned** |
 |--------|------------------------|--------------|--------------|------------|--------------|--------------|
-| RC-013 | As a user, I would like the application to run natively on my iPhone so that I can use it while driving. | 1 | -- | -- | -- | -- |
 | RC-015 | As a developer, I want to organize the video files by default as classes, and then there are available filters such as the date and year. Classes > Professor > School Year > Date. | -- | -- | -- | -- | -- |
 | RC-016 | As a developer, I want to create a login page. | -- | -- | -- | -- | -- |
 | RC-017 | As a user, I want to be able to create and login into an account. | -- | -- | -- | -- | -- |
