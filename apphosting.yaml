@@ -1,0 +1,16 @@
+kind: "AppHostingYaml"
+apiVersion: "v1"
+
+env:
+  - variable: VITE_FIREBASE_API_KEY
+    value: "AIzaSyBvFq1uKA03LHWQ35-SPwlCI2DsyVG7WGE"
+  - variable: VITE_FIREBASE_AUTH_DOMAIN
+    value: "pithub-test-kd.firebaseapp.com"
+  - variable: VITE_FIREBASE_PROJECT_ID
+    value: "pithub-test-kd"
+  - variable: VITE_FIREBASE_STORAGE_BUCKET
+    value: "pithub-test-kd.firebasestorage.app"
+  - variable: VITE_FIREBASE_MESSAGING_SENDER_ID
+    value: "95583116042"
+  - variable: VITE_FIREBASE_APP_ID
+    value: "1:95583116042:web:d87240e6c78af623b538f3"
