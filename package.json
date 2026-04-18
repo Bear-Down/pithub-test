@@ -11,7 +11,7 @@
     "dev:functions": "cd functions && npm run dev",
     "dev": "concurrently \"npm run dev:client\" \"firebase emulators:start\"",
     "build": "npm run build --workspace=client",
-    "deploy": "firebase deploy --only firestore"
+    "deploy": "firebase deploy"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
