@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import VideoList from '../videos/VideoList';
 import '../../styles/style.css';
 import { db } from '../../lib/firebase';
-import { collection, query, onSnapshot, addDoc, where, serverTimestamp } from 'firebase/firestore';
+import { collection, query, onSnapshot, addDoc, where, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 const ClassList = () => {
   const { user } = useAuth();
@@ -41,18 +41,25 @@ const ClassList = () => {
     }
   };
 
-  const handleEditClass = (classData) => {
+  const handleEditClass = async (classData) => {
     const newName = prompt("Edit class name:", classData.name);
     if (newName && newName !== classData.name) {
-      setClasses(classes.map(c => 
-        c.id === classData.id ? { ...c, name: newName } : c
-      ));
+      try {
+        const classRef = doc(db, 'classes', classData.id);
+        await updateDoc(classRef, { name: newName });
+      } catch (error) {
+        console.error("Error updating class:", error);
+      }
     }
   };
 
-  const handleDeleteClass = (id) => {
+  const handleDeleteClass = async (id) => {
     if (window.confirm("Are you sure you want to delete this class?")) {
-      setClasses(classes.filter(c => c.id !== id));
+      try {
+        await deleteDoc(doc(db, 'classes', id));
+      } catch (error) {
+        console.error("Error deleting class:", error);
+      }
     }
   };
 
