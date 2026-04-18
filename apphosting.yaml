@@ -4,14 +4,14 @@ buildConfig:
   rootDirectory: "."
 env:
   - variable: VITE_FIREBASE_STORAGE_BUCKET
-    secret: storageBucket
+    secret: STORAGE_BUCKET
     availability:
       - BUILD
   - variable: VITE_FIREBASE_API_KEY
-    secret: apiKey
+    secret: FIREBASE_API_KEY
     availability:
       - BUILD
   - variable: VITE_FIREBASE_PROJECT_ID
-    secret: projectId
+    secret: PROJECT_ID
     availability:
       - BUILD
