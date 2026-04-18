@@ -1,7 +1,7 @@
 import React from 'react';
 import { useVideos } from '../../hooks/useVideos';
 
-export function VideoList() {
+export default function VideoList() {
   const { videos, loading, error } = useVideos();
 
   if (loading) return <div className="status">Loading videos...</div>;
