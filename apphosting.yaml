@@ -2,3 +2,16 @@ kind: "AppStack"
 schemaVersion: "v1"
 buildConfig:
   rootDirectory: "."
+env:
+  - variable: VITE_FIREBASE_STORAGE_BUCKET
+    secret: storageBucket
+    availability:
+      - BUILD
+  - variable: VITE_FIREBASE_API_KEY
+    secret: apiKey
+    availability:
+      - BUILD
+  - variable: VITE_FIREBASE_PROJECT_ID
+    secret: projectId
+    availability:
+      - BUILD
