@@ -1,0 +1,4 @@
+kind: "AppStack"
+schemaVersion: "v1"
+buildConfig:
+  rootDirectory: "client"
