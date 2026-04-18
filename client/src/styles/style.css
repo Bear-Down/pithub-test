@@ -1,0 +1,210 @@
+body { 
+    font-family: system-ui, sans-serif; 
+    margin: 0; 
+    padding: 0; 
+    line-height: 1.5; 
+    background-color: #f4f4f4;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    top: 0;
+    left: 0;
+    background-color: orange;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+}
+.logo {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.logo a {
+    color: white;
+    text-decoration: none;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.placeholder-box {
+    width: 200px;
+    height: 30px;
+    background: #e0e0e0;
+    border-radius: 20px;
+}
+
+.circle {
+    width: 35px;
+    height: 35px;
+    background: #e0e0e0;
+    border-radius: 50%;
+}
+.file-list { list-style: none; padding: 20px;}
+.file-item { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; border: 1px solid #eee; margin-bottom: 0.5rem; border-radius: 8px; transition: background 0.2s; background-color: white;}
+.file-item:hover { background: #f9f9f9; }
+.file-link { color: #2563eb; text-decoration: none; font-weight: 500; }
+.file-link:hover { text-decoration: underline; }
+.status { padding: 20px;color: #666; font-style: italic; }
+
+.container h1, main h1 {
+    color: orange;
+    margin-top: 1.5rem;
+}
+
+.container h2, main h2 {
+    margin-top: 25px;
+    color: #444;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+p {
+    line-height: 1.6;
+    margin: 10px 0;
+}
+
+footer {
+    background-color: orange;
+    color: white;
+    padding: 15px;
+    width: 100%;
+    box-sizing: border-box; 
+    position: relative;
+}
+
+.footer-container {
+    max-width: 100%;       
+    margin: 0 auto;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
+
+.footer-center {
+    position: absolute;      
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+}
+
+.footer-links {
+    margin-left: auto;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 15px;
+    font-size: 14px;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+.classes-section {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto 40px auto;
+}
+
+.classes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.classes-horizontal-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 10px 5px 20px 5px;
+    scrollbar-width: thin;
+    scrollbar-color: orange #f4f4f4;
+}
+
+.class-card {
+    flex: 0 0 180px; 
+    background-color: white;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.class-card:hover {
+    transform: translateY(-4px);
+    border-color: orange;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.card-actions {
+    position: absolute;
+    bottom: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+
+.class-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f4f4f4;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.add-content-btn {
+    background-color: orange;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.add-content-btn:hover {
+    background-color: #e69500;
+}
+
+.add-content-btn:active {
+    transform: scale(0.98);
+}
