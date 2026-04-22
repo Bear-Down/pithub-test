@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/style.css'; 
+import userIconFallback from '../../assets/user-icon.jpg';
 
 const Layout = () => {
 	const { user, logout } = useAuth();
@@ -21,7 +22,7 @@ const Layout = () => {
 	}, []);
 
 	return (
-		<>
+		<div className="app-container">
 		<header className="header">
 			<div className="logo">
 			<Link to="/">PitHub</Link>
@@ -31,8 +32,16 @@ const Layout = () => {
 			{user && (
 				<div className="profile-container" ref={dropdownRef}>
 					<div className="circle" onClick={toggleDropdown} style={{ cursor: 'pointer', overflow: 'hidden' }}>
-						{user.photoURL && <img src="/assets/user-icon.jpg" alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+						{/* {user.photoURL && <img src="/assets/user-icon.jpg" alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />} */}
 						{/* {user.photoURL ? <img src={user.photoURL} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div className="user-placeholder" />} */}
+						<img 
+							src={user.photoURL || userIconFallback} 
+							alt="User" 
+							style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+							onError={(e) => {
+								e.target.src = userIconFallback;
+							}}
+						/>
 					</div>
 					{showDropdown && (
 						<div className="profile-dropdown">
@@ -51,15 +60,18 @@ const Layout = () => {
 			<Outlet />
 		</main>
 
-		<footer className="footer">
-			<div className="footer-container">
-			<span className="footer-center">2026 PitHub | All Rights Reserved</span>
-			<div className="footer-links">
-				<Link to="/terms">Terms of Use</Link> | <Link to="/about">About</Link>
-			</div>
-			</div>
-		</footer>
-		</>
+          <footer>
+            <div className="footer-container">
+              <div className="footer-center">
+                &copy; {new Date().getFullYear()} PitHub - Bear Down
+              </div>
+              <div className="footer-links">
+                <Link to="/about">About</Link>
+                <Link to="/terms">Terms</Link>
+              </div>
+            </div>
+          </footer>
+		</div>
 	);
 };
 
