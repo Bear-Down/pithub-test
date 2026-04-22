@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import { onAuthStateChanged } from "firebase/auth";
-
-import { auth } from "../lib/firebase";
-import { AuthProvider } from '../context/AuthContext';
+import { AuthProvider, useAuth } from '../context/AuthContext';
 
 import ClassList from '../features/classes/ClassList';
 import ClassPage from '../features/classes/ClassPage';
@@ -16,30 +13,12 @@ import ProtectedRoute from "../pages/components/ProtectedRoute";
 
 import '../styles/style.css';
 
-function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+function AppContent() {
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user && user.email.endsWith("@lewisu.edu")) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  if (loading) {
-    // You can add a loading screen or spinner here if needed
-    return <div>Loading...</div>;
-  }
+  if (loading) return <div>Loading...</div>;
 
   return (
-    <AuthProvider>
       <Router>
         <div className="app-container">
           <header>
@@ -99,6 +78,13 @@ function App() {
           </footer>
         </div>
       </Router>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
     </AuthProvider>
   );
 }
