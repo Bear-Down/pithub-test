@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "../lib/firebase";
+import { onAuthStateChanged, signOut, signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../lib/firebase";
 
 const AuthContext = createContext();
 
@@ -23,8 +23,18 @@ export const AuthProvider = ({ children }) => {
 		return () => unsubscribe();
 	}, []);
 
+	const logout = () => signOut(auth);
+
+	const loginWithGoogle = async () => {
+		try {
+			await signInWithPopup(auth, provider);
+		} catch (error) {
+			console.error("Login failed:", error);
+		}
+	};
+
 	return (
-		<AuthContext.Provider value={{ user, loading }}>
+		<AuthContext.Provider value={{ user, loading, logout, loginWithGoogle }}>
 			{!loading && children}
 		</AuthContext.Provider>
 	);
