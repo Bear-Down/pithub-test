@@ -1,10 +1,25 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import '../styles/style.css'; 
 
 const Layout = () => {
-	// For shared components (header, main content, footer) 
-	// NOT USED YET
+	const { user, logout } = useAuth();
+	const [showDropdown, setShowDropdown] = useState(false);
+	const dropdownRef = useRef(null);
+
+	const toggleDropdown = () => setShowDropdown(!showDropdown);
+
+	useEffect(() => {
+		const handleClickOutside = (event) => {
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+				setShowDropdown(false);
+			}
+		};
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => document.removeEventListener("mousedown", handleClickOutside);
+	}, []);
+
 	return (
 		<>
 		<header className="header">
@@ -13,7 +28,21 @@ const Layout = () => {
 			</div>
 			<div className="header-right">
 			<div className="placeholder-box"></div>
-			<div className="circle"></div>
+			{user && (
+				<div className="profile-container" ref={dropdownRef}>
+					<div className="circle" onClick={toggleDropdown} style={{ cursor: 'pointer', overflow: 'hidden' }}>
+						{user.photoURL && <img src="/assets/user-icon.jpg" alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+						{/* {user.photoURL ? <img src={user.photoURL} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div className="user-placeholder" />} */}
+					</div>
+					{showDropdown && (
+						<div className="profile-dropdown">
+							<button className="dropdown-item">Profile</button>
+							<button className="dropdown-item">Settings</button>
+							<button className="dropdown-item logout" onClick={logout}>Log Out</button>
+						</div>
+					)}
+				</div>
+			)}
 			</div>
 		</header>
 
