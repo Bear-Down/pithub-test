@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { db, storage } from '../../lib/firebase';
-import { doc, collection, query, where, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { doc, collection, query, where, onSnapshot, addDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { useAuth } from '../../context/AuthContext';
+import ConfirmationModal from '../../components/ConfirmationModal';
 
 const ClassPage = () => {
 	const { classId } = useParams();
@@ -12,6 +13,7 @@ const ClassPage = () => {
 	const [files, setFiles] = useState([]);
 	const [classData, setClassData] = useState(null);
 	const [uploading, setUploading] = useState(false);
+	const [confirmDelete, setConfirmDelete] = useState(null);
 
 	// 1. Listen for the specific class document metadata
 	useEffect(() => {
@@ -62,7 +64,8 @@ const ClassPage = () => {
 			setUploading(true);
 			
 			// 1. Upload raw file to Firebase Storage
-			const storageRef = ref(storage, `classes/${classId}/${Date.now()}_${file.name}`);
+			const storagePath = `classes/${classId}/${Date.now()}_${file.name}`;
+			const storageRef = ref(storage, storagePath);
 			const uploadResult = await uploadBytes(storageRef, file);
 			
 			// 2. Get the public Download URL
@@ -72,6 +75,7 @@ const ClassPage = () => {
 			const fileData = {
 			name: file.name,
 			url: downloadURL,
+			storagePath: storagePath,
 			classId: classId,
 			ownerId: user?.uid || 'dev_user_789', // Fallback to mock ID
 			type: file.type,
@@ -93,6 +97,28 @@ const ClassPage = () => {
 			// Reset input so the same file can be selected again if deleted
 			event.target.value = null;
 		}
+		}
+	};
+
+	const handleDeleteFile = async (file) => {
+		try {
+			// 1. Delete from Firebase Storage
+			// Fallback to URL if storagePath isn't present in legacy documents
+			const storageRef = file.storagePath ? ref(storage, file.storagePath) : ref(storage, file.url);
+			await deleteObject(storageRef);
+		} catch (error) {
+			// If storage deletion fails (e.g. file missing), we still want to clean up the Firestore record
+			console.warn("Storage deletion error (file may not exist):", error.message);
+		}
+
+		try {
+			// 2. Delete Metadata from Firestore
+			const fileRef = doc(db, 'files', file.id);
+			await deleteDoc(fileRef);
+			console.log("File metadata successfully removed!");
+		} catch (error) {
+			console.error("Firestore Deletion Error:", error);
+			alert(`Failed to remove file record: ${error.message}`);
 		}
 	};
 
@@ -120,12 +146,23 @@ const ClassPage = () => {
 			{files.length > 0 ? (
 				files.map((file) => (
 				<li key={file.id} className="file-item">
-					<a href={file.url} target="_blank" rel="noreferrer" className="file-link">
-					{file.name}
-					</a>
-					<span className="file-type" style={{ fontSize: '0.8rem', color: '#888' }}>
-					{file.type.split('/')[1]?.toUpperCase() || 'FILE'}
-					</span>
+					<div className="file-info" style={{ flex: 1 }}>
+						<a href={file.url} target="_blank" rel="noreferrer" className="file-link">
+						{file.name}
+						</a>
+						<span className="file-type" style={{ fontSize: '0.8rem', color: '#888', marginLeft: '10px' }}>
+						{file.type.split('/')[1]?.toUpperCase() || 'FILE'}
+						</span>
+					</div>
+					{user?.uid === file.ownerId && (
+						<button 
+							className="delete-file-btn" 
+							onClick={() => setConfirmDelete(file)}
+							style={{ backgroundColor: '#ff4d4d', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', cursor: 'pointer', fontSize: '0.8rem' }}
+						>
+							Delete
+						</button>
+					)}
 				</li>
 				))
 			) : (
@@ -135,6 +172,23 @@ const ClassPage = () => {
 			)}
 			</ul>
 		</section>
+
+		<ConfirmationModal 
+			isOpen={!!confirmDelete}
+			title="Remove File?"
+			message={
+				<>
+					Are you sure you want to delete <strong>{confirmDelete?.name}</strong>? 
+					This will permanently remove the file from PitHub.
+				</>
+			}
+			confirmText="Confirm Delete"
+			onConfirm={() => {
+				handleDeleteFile(confirmDelete);
+				setConfirmDelete(null);
+			}}
+			onCancel={() => setConfirmDelete(null)}
+		/>
 
 		<div className="status">
 			<p>Class ID: {classId}</p>

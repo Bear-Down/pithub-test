@@ -9,8 +9,8 @@ const ClassCard = ({ classData, onEdit, onDelete }) => {
 			<h3>{classData.name}</h3>
 			{/* Stop onclick() bubble up the DOM */}
 			<div className="card-actions" onClick={(e) => e.stopPropagation()}>
-				<button onClick={() => onEdit(classData)}>Edit</button>
-				<button onClick={() => onDelete(classData.id)}>Delete</button>
+				<button className="edit-btn" onClick={() => onEdit(classData)}>Edit</button>
+				<button className="delete-btn" onClick={() => onDelete(classData)}>Delete</button>
 			</div>
 		</div>
 	);

@@ -3,12 +3,18 @@ import ClassCard from './ClassCard';
 import { useAuth } from '../../context/AuthContext';
 import VideoList from '../videos/VideoList';
 import '../../styles/style.css';
-import { db } from '../../lib/firebase';
-import { collection, query, onSnapshot, addDoc, where, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db, storage } from '../../lib/firebase';
+import { collection, query, onSnapshot, addDoc, where, serverTimestamp, doc, updateDoc, deleteDoc, getDocs } from 'firebase/firestore';
+import { ref, deleteObject } from 'firebase/storage';
+import ConfirmationModal from '../../components/ConfirmationModal';
+import InputModal from '../../components/InputModal';
 
 const ClassList = () => {
 	const { user } = useAuth();
 	const [classes, setClasses] = useState([]);
+	const [confirmDelete, setConfirmDelete] = useState(null);
+	const [inputModal, setInputModal] = useState({ isOpen: false, mode: 'create', data: null });
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	// Fetch classes from Firestore
 	useEffect(() => {
@@ -30,36 +36,62 @@ const ClassList = () => {
 		return () => unsubscribe();
 	}, [user?.uid]);
 
-	const handleCreateClass = async () => {
-		const name = prompt("Enter class name:");
-		if (name) {
+	const handleCreateClass = () => {
+		setInputModal({ isOpen: true, mode: 'create', data: null });
+	};
+
+	const handleEditClass = (classData) => {
+		setInputModal({ isOpen: true, mode: 'edit', data: classData });
+	};
+
+	const handleModalSubmit = async (name) => {
+		if (inputModal.mode === 'create') {
 			await addDoc(collection(db, 'classes'), {
 				name: name,
 				ownerId: user.uid,
 				createdAt: serverTimestamp()
 			});
-		}
-	};
-
-	const handleEditClass = async (classData) => {
-		const newName = prompt("Edit class name:", classData.name);
-		if (newName && newName !== classData.name) {
+		} else if (inputModal.mode === 'edit' && inputModal.data) {
 			try {
-				const classRef = doc(db, 'classes', classData.id);
-				await updateDoc(classRef, { name: newName });
+				const classRef = doc(db, 'classes', inputModal.data.id);
+				await updateDoc(classRef, { name: name });
 			} catch (error) {
 				console.error("Error updating class:", error);
 			}
 		}
+		setInputModal({ ...inputModal, isOpen: false });
 	};
 
-	const handleDeleteClass = async (id) => {
-		if (window.confirm("Are you sure you want to delete this class?")) {
-			try {
-				await deleteDoc(doc(db, 'classes', id));
-			} catch (error) {
-				console.error("Error deleting class:", error);
-			}
+	const handleDeleteClass = async (classData) => {
+		setIsDeleting(true);
+		try {
+			// 1. Fetch all files associated with this class
+			const q = query(collection(db, 'files'), where('classId', '==', classData.id));
+			const querySnapshot = await getDocs(q);
+			
+			// 2. Delete each file from Storage and Firestore metadata
+			const deletePromises = querySnapshot.docs.map(async (fileDoc) => {
+				const file = fileDoc.data();
+				try {
+					const storageRef = file.storagePath ? ref(storage, file.storagePath) : ref(storage, file.url);
+					await deleteObject(storageRef);
+				} catch (err) {
+					console.warn("Storage deletion error (file may already be gone):", err.message);
+				}
+				await deleteDoc(doc(db, 'files', fileDoc.id));
+			});
+
+			await Promise.all(deletePromises);
+
+			// 3. Delete the class itself
+			await deleteDoc(doc(db, 'classes', classData.id));
+			console.log("Class and all associated content deleted.");
+		} catch (error) {
+			console.error("Error deleting class:", error);
+			alert("Failed to delete class and its content.");
+		} finally {
+			setIsDeleting(false);
+			setConfirmDelete(null);
 		}
 	};
 
@@ -75,7 +107,7 @@ const ClassList = () => {
 			<div className="classes-section">
 				<div className="classes-header">
 				<h2>Your Classes</h2>
-				<button onClick={handleCreateClass}>+ Create Class</button>
+				<button className="create-class-btn" onClick={handleCreateClass}>+ Create Class</button>
 				</div>
 				{classes.length > 0 ? (
 				<div className="classes-horizontal-scroll">
@@ -84,7 +116,7 @@ const ClassList = () => {
 						key={item.id} 
 						classData={item} 
 						onEdit={handleEditClass}
-						onDelete={handleDeleteClass}
+						onDelete={(data) => setConfirmDelete(data)}
 					/>
 					))}
 				</div>
@@ -94,6 +126,32 @@ const ClassList = () => {
 				</div>
 				)}
 			</div>
+
+			<InputModal 
+				isOpen={inputModal.isOpen}
+				title={inputModal.mode === 'create' ? "Create New Class" : "Edit Class Name"}
+				placeholder="Enter class name"
+				initialValue={inputModal.data?.name || ""}
+				onConfirm={handleModalSubmit}
+				onCancel={() => setInputModal({ ...inputModal, isOpen: false })}
+				confirmText={inputModal.mode === 'create' ? "Create" : "Save Changes"}
+			/>
+
+			<ConfirmationModal 
+				isOpen={!!confirmDelete}
+				title="Delete Class?"
+				message={
+					<>
+						Are you sure you want to delete <strong>{confirmDelete?.name}</strong>? 
+						<br /><br />
+						<span style={{ color: '#ff4d4d', fontWeight: 'bold' }}>Warning:</span> This will permanently delete the class and <strong>all uploaded videos and documents</strong> within it.
+					</>
+				}
+				confirmText={isDeleting ? 'Deleting...' : 'Delete Everything'}
+				isLoading={isDeleting}
+				onConfirm={() => handleDeleteClass(confirmDelete)}
+				onCancel={() => setConfirmDelete(null)}
+			/>
 		</div>
 	);
 };
