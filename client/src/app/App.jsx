@@ -1,13 +1,37 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { onAuthStateChanged } from "firebase/auth";
+
+import { auth } from "../lib/firebase";
 import { AuthProvider } from '../context/AuthContext';
+
 import ClassList from '../features/classes/ClassList';
 import ClassPage from '../features/classes/ClassPage';
+
+import Login from "../pages/Login";
 import About from '../pages/About';
 import Terms from '../pages/Terms';
+
+import ProtectedRoute from "../pages/components/ProtectedRoute";
+
 import '../styles/style.css';
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user && user.email.endsWith("@lewisu.edu")) {
+      setUser(user);
+    } else {
+      setUser(null);
+    }
+    setLoading(false);
+  });
+
+  return () => unsubscribe();
+}, []);
   return (
     <AuthProvider>
       <Router>
@@ -24,11 +48,30 @@ function App() {
 
           <main>
             <Routes>
-              {/* The main page showing the square class containers */}
-              <Route path="/" element={<ClassList />} />
+              {/* LOGIN PAGE */}
+              <Route
+                path="/"
+                element={user ? <Navigate to="/classes" /> : <Login />}
+              />
               
-              {/* The specific page for each class to upload/view files */}
-              <Route path="/class/:classId" element={<ClassPage />} />
+              {/* Main page PR */}
+              <Route  
+                path="/classes"
+                element={
+                  <ProtectedRoute user={user}>
+                    <ClassList />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/class/:classId"
+                element={
+                  <ProtectedRoute user={user}>
+                    <ClassPage />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* About Page Route */}
               <Route path="/about" element={<About />} />
