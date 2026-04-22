@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/style.css';
+import googleIcon from '../../../assets/google-icon.jpg';
 
 const LoginPage = () => {
 	const { loginWithGoogle } = useAuth();
@@ -25,7 +26,7 @@ const LoginPage = () => {
 						{/* Branded Google Sign-In Button */}
 						<button className="google-signin-btn" onClick={loginWithGoogle}>
 							<img 
-								src="/assets/google-icon.jpg"
+								src={googleIcon}
 								alt="Google icon" 
 							/>
 							<span>Sign in with Google</span>
