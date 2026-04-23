@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/style.css'; 
-import userIconFallback from '../assets/user-icon.jpg';
+import userIconFallback from '/assets/user-icon.jpg';
 
 const Layout = () => {
 	const { user, logout } = useAuth();
