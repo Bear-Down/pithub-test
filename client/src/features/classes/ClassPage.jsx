@@ -57,11 +57,45 @@ const ClassPage = () => {
 		fileInputRef.current.click();
 	};
 
+	const generateVideoThumbnail = (file) => {
+		return new Promise((resolve) => {
+			const video = document.createElement('video');
+			const canvas = document.createElement('canvas');
+			const context = canvas.getContext('2d');
+
+			video.src = URL.createObjectURL(file);
+			video.load();
+			
+			video.onloadeddata = () => {
+				// Seek to 1 second to get a good frame
+				video.currentTime = 1;
+			};
+
+			video.onseeked = () => {
+				canvas.width = video.videoWidth;
+				canvas.height = video.videoHeight;
+				context.drawImage(video, 0, 0, canvas.width, canvas.height);
+				
+				canvas.toBlob((blob) => {
+					resolve(blob);
+					URL.revokeObjectURL(video.src);
+				}, 'image/jpeg', 0.7);
+			};
+
+			video.onerror = () => {
+				resolve(null);
+			};
+		});
+	};
+
 	const handleFileChange = async (event) => {
 		const file = event.target.files[0];
 		if (file) {
 		try {
 			setUploading(true);
+			
+			let thumbnailUrl = null;
+			let thumbnailPath = null;
 			
 			// 1. Upload raw file to Firebase Storage
 			const storagePath = `classes/${classId}/${Date.now()}_${file.name}`;
@@ -71,11 +105,24 @@ const ClassPage = () => {
 			// 2. Get the public Download URL
 			const downloadURL = await getDownloadURL(uploadResult.ref);
 			
+			// 2.5 Generate and upload thumbnail if it's a video
+			if (file.type.startsWith('video/')) {
+				const thumbBlob = await generateVideoThumbnail(file);
+				if (thumbBlob) {
+					thumbnailPath = `thumbnails/${classId}/${Date.now()}_thumb.jpg`;
+					const thumbRef = ref(storage, thumbnailPath);
+					await uploadBytes(thumbRef, thumbBlob);
+					thumbnailUrl = await getDownloadURL(thumbRef);
+				}
+			}
+			
 			// 3. Save Metadata to Firestore
 			const fileData = {
 			name: file.name,
 			url: downloadURL,
 			storagePath: storagePath,
+			thumbnailUrl: thumbnailUrl,
+			thumbnailPath: thumbnailPath,
 			classId: classId,
 			ownerId: user?.uid || 'dev_user_789', // Fallback to mock ID
 			type: file.type,
@@ -132,7 +179,9 @@ const ClassPage = () => {
 			ref={fileInputRef} 
 			style={{ display: 'none' }} 
 			onChange={handleFileChange}
-			accept="video/*,.pdf,.doc,.docx,.xls,.xlsx"
+			accept="video/*,.mp4,.mov,.webm,.avi,.mkv,.flv,
+			.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rtf,.html,.htm,
+			.jpg, .jpeg, .png, .gif, .bmp, .webp"
 		/>
 
 		<div className="class-page-header">
@@ -148,28 +197,35 @@ const ClassPage = () => {
 			{files.length > 0 ? (
 				files.map((file) => (
 				<li key={file.id} className="file-item">
-					<div className="file-info" style={{ flex: 1 }}>
-						<a href={file.url} target="_blank" rel="noreferrer" className="file-link">
+					<div className="file-info" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+					{file.thumbnailUrl ? (
+						<img 
+						src={file.thumbnailUrl} 
+						alt="thumbnail" 
+						style={{ width: '80px', height: '45px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd' }}
+						/>
+					) : (
+						<div style={{ width: '80px', height: '45px', backgroundColor: '#f0f0f0', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', color: '#999' }}>
+						DOC
+						</div>
+					)}
+					<a href={file.url} target="_blank" rel="noreferrer" className="file-link">
 						{file.name}
-						</a>
-						<span className="file-type" style={{ fontSize: '0.8rem', color: '#888', marginLeft: '10px' }}>
+					</a>
+					<span className="file-type" style={{ fontSize: '0.8rem', color: '#888', marginLeft: '10px' }}>
 						{file.type.split('/')[1]?.toUpperCase() || 'FILE'}
-						</span>
+					</span>
 					</div>
 					{user?.uid === file.ownerId && (
-						<button 
-							className="delete-file-btn" 
-							onClick={() => setConfirmDelete(file)}
-							style={{ backgroundColor: '#ff4d4d', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', cursor: 'pointer', fontSize: '0.8rem' }}
-						>
-							Delete
-						</button>
+					<button onClick={() => setConfirmDelete(file)} style={{ backgroundColor: '#ff4d4d', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', cursor: 'pointer', fontSize: '0.8rem' }}>
+						Delete
+					</button>
 					)}
 				</li>
 				))
 			) : (
 				<li className="file-item">
-				<span className="file-link">No content uploaded yet for this class.</span>
+				<span>No content uploaded yet for this class.</span>
 				</li>
 			)}
 			</ul>
@@ -192,9 +248,9 @@ const ClassPage = () => {
 			onCancel={() => setConfirmDelete(null)}
 		/>
 
-		<div className="status">
+		{/* <div className="status">
 			<p>Class ID: {classId}</p>
-		</div>
+		</div> */}
 		</div>
 	);
 };

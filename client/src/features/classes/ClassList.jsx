@@ -49,7 +49,8 @@ const ClassList = () => {
 			await addDoc(collection(db, 'classes'), {
 				name: name,
 				ownerId: user.uid,
-				createdAt: serverTimestamp()
+				createdAt: serverTimestamp(),
+				visibility: 'private' // Default to private
 			});
 		} else if (inputModal.mode === 'edit' && inputModal.data) {
 			try {
@@ -58,6 +59,16 @@ const ClassList = () => {
 			} catch (error) {
 				console.error("Error updating class:", error);
 			}
+		}
+		setInputModal({ ...inputModal, isOpen: false });
+	};
+
+	const handleUpdateClassVisibility = async (classId, newVisibility) => {
+		try {
+			const classRef = doc(db, 'classes', classId);
+			await updateDoc(classRef, { visibility: newVisibility });
+		} catch (error) {
+			console.error("Error updating class:", error);
 		}
 		setInputModal({ ...inputModal, isOpen: false });
 	};
@@ -117,6 +128,7 @@ const ClassList = () => {
 						classData={item} 
 						onEdit={handleEditClass}
 						onDelete={(data) => setConfirmDelete(data)}
+						onVisibilityChange={handleUpdateClassVisibility}
 					/>
 					))}
 				</div>

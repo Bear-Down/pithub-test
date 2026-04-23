@@ -13,9 +13,20 @@ export default function VideoList() {
 			<ul className="file-list">
 			{videos.map((video) => (
 				<li key={video.id} className="file-item">
-				<a href={video.url} target="_blank" rel="noreferrer" className="file-link">
-					{video.name}
-				</a>
+					<div className="file-info" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+						{video.thumbnailUrl ? (
+							<img 
+								src={video.thumbnailUrl} 
+								alt="thumbnail" 
+								style={{ width: '80px', height: '45px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd' }} 
+							/>
+						) : (
+							<div className="thumbnail-placeholder">DOC</div>
+						)}
+						<a href={video.url} target="_blank" rel="noreferrer" className="file-link">
+							{video.name}
+						</a>
+					</div>
 				</li>
 			))}
 			</ul>

@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/style.css'; 
-import userIconFallback from '/assets/user-icon.jpg';
+import userIconFallback from '../assets/user-icon.jpg';
 
 const Layout = () => {
 	const { user, logout } = useAuth();
+	const navigate = useNavigate();
 	const [showDropdown, setShowDropdown] = useState(false);
 	const dropdownRef = useRef(null);
 
@@ -45,7 +46,10 @@ const Layout = () => {
 					</div>
 					{showDropdown && (
 						<div className="profile-dropdown">
-							<button className="dropdown-item">Profile</button>
+							<button className="dropdown-item" onClick={() => {
+								navigate('/profile');
+								setShowDropdown(false);
+							}}>Profile</button>
 							<button className="dropdown-item">Settings</button>
 							<button className="dropdown-item logout" onClick={logout}>Log Out</button>
 						</div>

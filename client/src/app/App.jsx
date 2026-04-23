@@ -5,12 +5,13 @@ import { AuthProvider, useAuth } from '../context/AuthContext';
 import ClassList from '../features/classes/ClassList';
 import ClassPage from '../features/classes/ClassPage';
 import LoginPage from '../features/auth/LoginPage';
+import ProfilePage from '../features/profile/ProfilePage';
 import Layout from './Layout';
+import ProtectedRoute from '../components/ProtectedRoute';
 
-import About from '../pages/About';
-import Terms from '../pages/Terms';
+import About from '../features/info/About';
+import Terms from '../features/info/Terms';
 
-import ProtectedRoute from "../pages/components/ProtectedRoute";
 import '../styles/style.css';
 
 function AppContent() {
@@ -32,6 +33,7 @@ function AppContent() {
 			<Route element={<Layout />}>
 				<Route path="/classes" element={<ProtectedRoute user={user}><ClassList /></ProtectedRoute>} />
 				<Route path="/class/:classId" element={<ProtectedRoute user={user}><ClassPage /></ProtectedRoute>} />
+				<Route path="/profile" element={<ProtectedRoute user={user}><ProfilePage /></ProtectedRoute>} />
 				<Route path="/about" element={<About />} />
 				<Route path="/terms" element={<Terms />} />
 			</Route>
