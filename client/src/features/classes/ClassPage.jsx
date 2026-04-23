@@ -155,6 +155,11 @@ const ClassPage = () => {
 			// Fallback to URL if storagePath isn't present in legacy documents
 			const storageRef = file.storagePath ? ref(storage, file.storagePath) : ref(storage, file.url);
 			await deleteObject(storageRef);
+
+			// Also delete thumbnail if it exists
+			if (file.thumbnailPath) {
+				await deleteObject(ref(storage, file.thumbnailPath));
+			}
 		} catch (error) {
 			// If storage deletion fails (e.g. file missing), we still want to clean up the Firestore record
 			console.warn("Storage deletion error (file may not exist):", error.message);
