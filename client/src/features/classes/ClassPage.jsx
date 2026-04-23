@@ -86,8 +86,10 @@ const ClassPage = () => {
 
 			console.log("File successfully uploaded and indexed!");
 		} catch (error) {
-			console.error("Firebase Upload Error:", error.code, error.message);
-			if (error.code === 'storage/unauthorized') {
+			console.error("Firebase Upload Error:", error);
+			if (error.message.includes('ERR_CONNECTION_REFUSED') || error.code === 'storage/retry-limit-exceeded') {
+				alert("Network Error: Access to Firebase Storage is being refused. If you are on a University Wi-Fi, they may be blocking uploads. Try using a VPN or mobile data.");
+			} else if (error.code === 'storage/unauthorized') {
 			alert("Permission Denied: Update your Firebase Storage Rules in the console.");
 			} else {
 			alert(`Upload failed: ${error.message}`);

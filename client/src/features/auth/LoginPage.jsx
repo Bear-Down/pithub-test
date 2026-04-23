@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/style.css';
-import googleIcon from '../../../assets/google-icon.jpg';
+import googleIcon from '../../assets/google-icon.jpg';
 
 const LoginPage = () => {
 	const { loginWithGoogle } = useAuth();
@@ -42,10 +42,6 @@ const LoginPage = () => {
 						you would insert the form inputs here between the header and actions.
 					*/}
 				</div>
-				
-				{/* Decorative background elements */}
-				<div className="bg-blob-1"></div>
-				<div className="bg-blob-2"></div>
 			</div>
 		</div>
 	);

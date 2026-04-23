@@ -11,7 +11,7 @@ export default function VideoList() {
 	return (
 		<ul className="file-list">
 		{videos.map((video) => (
-			<li key={video.name} className="file-item">
+			<li key={video.id} className="file-item">
 			<a href={video.url} target="_blank" rel="noreferrer" className="file-link">
 				{video.name}
 			</a>

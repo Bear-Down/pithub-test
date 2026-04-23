@@ -6,7 +6,7 @@
       "http://127.0.0.1:5173"
     ],
     "method": ["GET", "POST", "PUT", "DELETE", "HEAD"],
-    "responseHeader": ["Content-Type", "Authorization", "x-firebase-storage-version"],
+    "responseHeader": ["Content-Type", "Authorization", "x-firebase-storage-version", "Access-Control-Allow-Origin"],
     "maxAgeSeconds": 3600
   }
 ]
