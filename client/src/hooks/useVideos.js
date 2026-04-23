@@ -1,19 +1,24 @@
 import { useState, useEffect } from "react";
-import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+import { collection, query, orderBy, limit, onSnapshot, startAfter } from "firebase/firestore";
 import { db } from "../lib/firebase"; // Import db from firebase.js
 
 export function useVideos() {
 	const [videos, setVideos] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [page, setPage] = useState(1);
+	const [lastDocs, setLastDocs] = useState([]); // Store the last doc snapshot of each page for "Next" navigation
+	const pageSize = 5;
 
 	useEffect(() => {
+		setLoading(true);
+		// To get page N, we startAfter the last doc of page N-1
+		const cursor = page > 1 ? lastDocs[page - 2] : null;
+
 		// Create a query to get recent files from Firestore
-		const filesQuery = query(
-			collection(db, "files"),
-			orderBy("createdAt", "desc"), // Order by creation time, newest first
-			limit(10) // Limit to the 10 most recent files
-		);
+		const filesQuery = cursor 
+			? query(collection(db, "files"), orderBy("createdAt", "desc"), startAfter(cursor), limit(pageSize))
+			: query(collection(db, "files"), orderBy("createdAt", "desc"), limit(pageSize));
 
 		const unsubscribe = onSnapshot(filesQuery, 
 			(snapshot) => {
@@ -21,7 +26,16 @@ export function useVideos() {
 					id: doc.id,
 					...doc.data()
 				}));
-				setVideos(fetchedFiles); // Renamed "setVideos" to "setFiles"
+				setVideos(fetchedFiles);
+				
+				// Update our cursor history with the last document of the current snapshot
+				if (snapshot.docs.length > 0) {
+					setLastDocs(prev => {
+						const next = [...prev];
+						next[page - 1] = snapshot.docs[snapshot.docs.length - 1];
+						return next;
+					});
+				}
 				setLoading(false);
 			}, 
 			(err) => {
@@ -32,7 +46,10 @@ export function useVideos() {
 		);
 
 		return () => unsubscribe(); // Cleanup the listener
-	}, []);
+	}, [page]);
 
-	return { videos, loading, error };
+	const nextPage = () => setPage(p => p + 1);
+	const prevPage = () => setPage(p => Math.max(1, p - 1));
+
+	return { videos, loading, error, nextPage, prevPage, page, hasNext: videos.length === pageSize };
 }
