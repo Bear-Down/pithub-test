@@ -103,7 +103,7 @@ const ClassPage = () => {
 			const storagePath = `classes/${classId}/${Date.now()}_${file.name}`;
 			const storageRef = ref(storage, storagePath);
 
-			const uploadTask = uploadBytesResumable(storageRef, file);
+			const uploadTask = uploadBytesResumable(storageRef, file, { contentType: file.type });
 
 			// Using a promise to wrap the resumable upload for cleaner async/await usage
 			await new Promise((resolve, reject) => {
