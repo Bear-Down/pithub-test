@@ -114,35 +114,39 @@ const ClassPage = () => {
 					},
 					(error) => reject(error),
 					async () => {
-						// 2. Get the public Download URL
-						const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-						
-						// 2.5 Generate and upload thumbnail if it's a video
-						if (file.type.startsWith('video/')) {
-							const thumbBlob = await generateVideoThumbnail(file);
-							if (thumbBlob) {
-								thumbnailPath = `thumbnails/${classId}/${Date.now()}_thumb.jpg`;
-								const thumbRef = ref(storage, thumbnailPath);
-								await uploadBytes(thumbRef, thumbBlob);
-								thumbnailUrl = await getDownloadURL(thumbRef);
+						try {
+							// 2. Get the public Download URL
+							const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+							
+							// 2.5 Generate and upload thumbnail if it's a video
+							if (file.type.startsWith('video/')) {
+								const thumbBlob = await generateVideoThumbnail(file);
+								if (thumbBlob) {
+									thumbnailPath = `thumbnails/${classId}/${Date.now()}_thumb.jpg`;
+									const thumbRef = ref(storage, thumbnailPath);
+									await uploadBytes(thumbRef, thumbBlob);
+									thumbnailUrl = await getDownloadURL(thumbRef);
+								}
 							}
-						}
-						
-						// 3. Save Metadata to Firestore
-						const fileData = {
-							name: file.name,
-							url: downloadURL,
-							storagePath: storagePath,
-							thumbnailUrl: thumbnailUrl,
-							thumbnailPath: thumbnailPath,
-							classId: classId,
-							ownerId: user?.uid || 'dev_user_789',
-							type: file.type,
-							createdAt: serverTimestamp()
-						};
+							
+							// 3. Save Metadata to Firestore
+							const fileData = {
+								name: file.name,
+								url: downloadURL,
+								storagePath: storagePath,
+								thumbnailUrl: thumbnailUrl,
+								thumbnailPath: thumbnailPath,
+								classId: classId,
+								ownerId: user?.uid || 'dev_user_789',
+								type: file.type,
+								createdAt: serverTimestamp()
+							};
 
-						await addDoc(collection(db, 'files'), fileData);
-						resolve();
+							await addDoc(collection(db, 'files'), fileData);
+							resolve();
+						} catch (innerError) {
+							reject(innerError);
+						}
 					}
 				);
 			});

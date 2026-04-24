@@ -7,7 +7,6 @@
     ],
     "method": ["GET", "POST", "PUT", "DELETE", "HEAD"],
     "responseHeader": [
-      "Origin",
       "Content-Type", 
       "Authorization", 
       "x-firebase-storage-version", 
