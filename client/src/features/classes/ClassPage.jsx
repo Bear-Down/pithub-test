@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { db, storage } from '../../lib/firebase';
 import { doc, collection, query, where, onSnapshot, addDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject, uploadBytes } from 'firebase/storage';
 import { useAuth } from '../../context/AuthContext';
 import ConfirmationModal from '../../components/ConfirmationModal';
 
@@ -13,6 +13,7 @@ const ClassPage = () => {
 	const [files, setFiles] = useState([]);
 	const [classData, setClassData] = useState(null);
 	const [uploading, setUploading] = useState(false);
+	const [uploadProgress, setUploadProgress] = useState(0);
 	const [confirmDelete, setConfirmDelete] = useState(null);
 
 	// 1. Listen for the specific class document metadata
@@ -93,6 +94,7 @@ const ClassPage = () => {
 		if (file) {
 		try {
 			setUploading(true);
+			setUploadProgress(0);
 			
 			let thumbnailUrl = null;
 			let thumbnailPath = null;
@@ -100,36 +102,50 @@ const ClassPage = () => {
 			// 1. Upload raw file to Firebase Storage
 			const storagePath = `classes/${classId}/${Date.now()}_${file.name}`;
 			const storageRef = ref(storage, storagePath);
-			const uploadResult = await uploadBytes(storageRef, file);
-			
-			// 2. Get the public Download URL
-			const downloadURL = await getDownloadURL(uploadResult.ref);
-			
-			// 2.5 Generate and upload thumbnail if it's a video
-			if (file.type.startsWith('video/')) {
-				const thumbBlob = await generateVideoThumbnail(file);
-				if (thumbBlob) {
-					thumbnailPath = `thumbnails/${classId}/${Date.now()}_thumb.jpg`;
-					const thumbRef = ref(storage, thumbnailPath);
-					await uploadBytes(thumbRef, thumbBlob);
-					thumbnailUrl = await getDownloadURL(thumbRef);
-				}
-			}
-			
-			// 3. Save Metadata to Firestore
-			const fileData = {
-			name: file.name,
-			url: downloadURL,
-			storagePath: storagePath,
-			thumbnailUrl: thumbnailUrl,
-			thumbnailPath: thumbnailPath,
-			classId: classId,
-			ownerId: user?.uid || 'dev_user_789', // Fallback to mock ID
-			type: file.type,
-			createdAt: serverTimestamp()
-			};
 
-			await addDoc(collection(db, 'files'), fileData);
+			const uploadTask = uploadBytesResumable(storageRef, file);
+
+			// Using a promise to wrap the resumable upload for cleaner async/await usage
+			await new Promise((resolve, reject) => {
+				uploadTask.on('state_changed', 
+					(snapshot) => {
+						const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+						setUploadProgress(Math.round(progress));
+					},
+					(error) => reject(error),
+					async () => {
+						// 2. Get the public Download URL
+						const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+						
+						// 2.5 Generate and upload thumbnail if it's a video
+						if (file.type.startsWith('video/')) {
+							const thumbBlob = await generateVideoThumbnail(file);
+							if (thumbBlob) {
+								thumbnailPath = `thumbnails/${classId}/${Date.now()}_thumb.jpg`;
+								const thumbRef = ref(storage, thumbnailPath);
+								await uploadBytes(thumbRef, thumbBlob);
+								thumbnailUrl = await getDownloadURL(thumbRef);
+							}
+						}
+						
+						// 3. Save Metadata to Firestore
+						const fileData = {
+							name: file.name,
+							url: downloadURL,
+							storagePath: storagePath,
+							thumbnailUrl: thumbnailUrl,
+							thumbnailPath: thumbnailPath,
+							classId: classId,
+							ownerId: user?.uid || 'dev_user_789',
+							type: file.type,
+							createdAt: serverTimestamp()
+						};
+
+						await addDoc(collection(db, 'files'), fileData);
+						resolve();
+					}
+				);
+			});
 
 			console.log("File successfully uploaded and indexed!");
 		} catch (error) {
@@ -143,6 +159,7 @@ const ClassPage = () => {
 			}
 		} finally {
 			setUploading(false);
+			setUploadProgress(0);
 			// Reset input so the same file can be selected again if deleted
 			event.target.value = null;
 		}
@@ -192,7 +209,7 @@ const ClassPage = () => {
 		<div className="class-page-header">
 			<h1>{classData ? classData.name : 'Loading...'}</h1>
 			<button className="add-content-btn" onClick={handleAddClick} disabled={uploading}>
-			{uploading ? 'Uploading...' : '+ Add Video / Document'}
+			{uploading ? `Uploading ${uploadProgress}%` : '+ Add Video / Document'}
 			</button>
 		</div>
 
