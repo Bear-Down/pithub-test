@@ -48,3 +48,4 @@ Scrum Master: Kaleb Richardson
 | RC-058 | As a developer, I want to implement role-based permissions (future) so that professors and students may have different capabilities. | 8 | -- | Y | -- | -- |
 | RC-059 | As a developer, I want to implement two environments; for production and development, to separate and isolate different features that are still in progress. | 7 | -- | Y | -- | -- |
 | RC-060 | As a user, I want to be able to report videos or documents that have bad or illegal content | 7 | -- | N | -- | -- |
+| RC-060 | As a user, I want to be able to use PitHub while I am connected to University Wi-Fi so that I may upload and view school related documents. | 7 | 5 | N | In-Progress | -- |
