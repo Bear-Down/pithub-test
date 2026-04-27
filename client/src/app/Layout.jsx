@@ -8,7 +8,8 @@ import Spinner from '../components/Spinner';
 const Layout = () => {
 	const { user, logout } = useAuth();
 	const navigate = useNavigate();
-	const [loading, setLoading, showDropdown, setShowDropdown] = useState(false);
+	const [showDropdown, setShowDropdown] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const dropdownRef = useRef(null);
 
 	const toggleDropdown = () => setShowDropdown(!showDropdown);
@@ -26,6 +27,7 @@ const Layout = () => {
 	const handleLogout = async () => {
 		setLoading(true)
 		await logout();
+		setShowDropdown(false);
 		navigate("/logout");
 	};
 
