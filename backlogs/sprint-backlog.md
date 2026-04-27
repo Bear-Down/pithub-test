@@ -11,9 +11,9 @@ Scrum Master: Kaleb Richardson
 
 | **ID** | **User Story / Task** | **Priority (1-10)** | **Estimate (SP)** | **Spike (Y/N)** | **Status** | **Assigned** |
 |--------|------------------------|--------------|--------------|------------|--------------|--------------|
-| RC-015 | As a developer, I want to organize the video files by default as classes, and then there are available filters such as the date and year. Classes > Professor > School Year > Date. | 5 | 6 | Y | In-Progress | Edward Rodriguez |
+| RC-015 | As a developer, I want to organize the video files by default as classes, and then there are available filters such as the date and year. Classes > Professor > School Year > Date. | 5 | 6 | Y | Done | Edward Rodriguez |
 | RC-017 | As a user, I want to be able to create and login into an account. | 8 | 3 | N | Done | Erick Hernandez|
-| RC-018 | As a user, I want to be able to set my videos as public or private. |6 | 3 | N | Done | Kevin Dacanay |
+| RC-018 | As a user, I want to be able to set my videos as public or private. |6 | 3 | N | Done | Edward Rodriguez |
 | RC-034 | As a user, I want to log in using my university email so that only authorized users can access the platform. | 8 | 6 | N | Done | Erick Hernandez |
 | RC-036 | As a user, I want to securely log out of my account so that others cannot access my data on shared devices. | 7 | 5 | N | Done | Sebastian Jaculbe |
 | RC-037 | As a user, I want to create classes and assign videos to them so that my content is organized by course. | 8 | 6 | N | Done | Kevin Dacanay |
