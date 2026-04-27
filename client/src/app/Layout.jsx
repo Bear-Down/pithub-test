@@ -3,7 +3,7 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/style.css'; 
 import userIconFallback from '../assets/user-icon.jpg';
-import Spinner from '../../components/Spinner';
+import Spinner from '../components/Spinner';
 
 const Layout = () => {
 	const { user, logout } = useAuth();
