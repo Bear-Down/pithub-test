@@ -1,15 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/style.css';
 import googleIcon from '../../assets/google-icon.jpg';
+import Spinner from '../../components/Spinner';
 
 const LogoutPage = () => {
-	const { logout, loginWithGoogle } = useAuth();
+	const { loginWithGoogle } = useAuth();
+	const [loading, setLoading] = useState(false);
 
-	useEffect(() => {
-		logout();
-	}, []);
+	const handleLogin = async () => {
+		setLoading(true);
+		try {
+			await loginWithGoogle();
+		} catch (error) {
+			console.error(error);
+		}
+		setLoading(false);
+	}
 
 	return (
 		<div className="logout-screen">
@@ -28,13 +36,17 @@ const LogoutPage = () => {
 
 					<div className="login-actions">
 						{/* Branded Google Sign-In Button */}
-						<button className="google-signin-btn" onClick={loginWithGoogle}>
-							<img 
-								src={googleIcon}
-								alt="Google icon" 
-							/>
-							<span>Sign in with Google</span>
-						</button>
+						{loading ? (
+							<Spinner />
+						) : (
+							<button className="google-signin-btn" onClick={handleLogin}>
+								<img 
+									src={googleIcon}
+									alt="Google icon" 
+								/>
+								<span>Sign in with Google</span>
+							</button>
+						)}
 					</div>
 
 					<div className="login-footer">
