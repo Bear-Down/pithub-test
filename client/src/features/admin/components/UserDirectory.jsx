@@ -175,7 +175,7 @@ export default function UserDirectory() {
 														Suspend
 													</button>
 												)}
-												{user.role === 'admin' ? (
+												{/* {user.role === 'admin' ? (
 													<button type="button" className="admin-action-btn" onClick={() => openSignOff('update_user_role', user, 'user')}>
 														Demote
 													</button>
@@ -183,7 +183,7 @@ export default function UserDirectory() {
 													<button type="button" className="admin-action-btn admin-action-warning" onClick={() => openSignOff('update_user_role', user, 'admin')}>
 														Promote
 													</button>
-												)}
+												)} */}
 											</div>
 										</td>
 									</tr>
