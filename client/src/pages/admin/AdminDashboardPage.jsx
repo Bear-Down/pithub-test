@@ -1,0 +1,102 @@
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import AdminDashboardLayout from '../../components/admin/AdminDashboardLayout';
+import StatsOverview from '../../components/admin/StatsOverview';
+import RecentUploadsTable from '../../components/admin/RecentUploadsTable';
+import FlaggedContentQueue from '../../components/admin/FlaggedContentQueue';
+import UserDirectory from '../../components/admin/UserDirectory';
+import ClassDirectory from '../../components/admin/ClassDirectory';
+import FileExplorer from '../../components/admin/FileExplorer';
+import ReportManagement from '../../components/admin/ReportManagement';
+import AdminLogsTable from '../../components/admin/AdminLogsTable';
+import { useAdminData } from '../../hooks/admin/useAdminData';
+
+const AdminDashboardPage = () => {
+	const {
+		totalUsers,
+		totalClasses,
+		totalFiles,
+		recentUploads,
+		flaggedContent,
+		loading,
+		error,
+		refreshStats,
+	} = useAdminData();
+
+	const { section } = useParams();
+
+	if (loading && !section) {
+		return (
+			<AdminDashboardLayout>
+				<div className="admin-flex admin-flex-col admin-items-center admin-justify-center" style={{ minHeight: '60vh' }}>
+					<div className="admin-loading-spinner"></div>
+					<p style={{ marginTop: '16px', fontWeight: 900, color: 'var(--admin-text-muted)', textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.1em' }}>Synchronizing Systems...</p>
+				</div>
+			</AdminDashboardLayout>
+		);
+	}
+
+	if (error && !section) {
+		return (
+			<AdminDashboardLayout>
+				<div style={{ backgroundColor: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.1)', padding: '32px', borderRadius: '24px', textAlign: 'center' }}>
+					<h2 style={{ fontSize: '20px', fontWeight: 900, textTransform: 'uppercase', marginBottom: '8px' }}>System Error</h2>
+					<p style={{ color: 'var(--admin-text-muted)', marginBottom: '24px' }}>{error}</p>
+					<button onClick={refreshStats} className="create-class-btn">Retry Connection</button>
+				</div>
+			</AdminDashboardLayout>
+		);
+	}
+
+	const renderContent = () => {
+		switch (section) {
+		case 'users':
+			return <UserDirectory />;
+		case 'classes':
+			return <ClassDirectory />;
+		case 'files':
+			return <FileExplorer />;
+		case 'reports':
+			return <ReportManagement />;
+		case 'logs':
+			return <AdminLogsTable />;
+		default:
+			return (
+				<div className="admin-flex admin-flex-col" style={{ gap: '24px' }}>
+					<StatsOverview
+						totalUsers={totalUsers}
+						totalClasses={totalClasses}
+						totalFiles={totalFiles}
+						onRefresh={refreshStats}
+					/>
+					<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '32px' }}>
+						<RecentUploadsTable uploads={recentUploads} />
+						<FlaggedContentQueue flaggedItems={flaggedContent} />
+					</div>
+				</div>
+			);
+		}
+	};
+
+	const getTitle = () => {
+		if (!section) return 'System Overview';
+		if (section === 'logs') return 'Audit Logs';
+		return section.charAt(0).toUpperCase() + section.slice(1);
+	};
+
+	return (
+		<AdminDashboardLayout>
+			<div style={{ marginBottom: '32px' }}>
+				<h1 style={{ fontSize: '48px', fontWeight: 900, letterSpacing: '-0.03em', textTransform: 'uppercase', lineHeight: 1, color: 'var(--admin-text-main)' }}>
+					{getTitle()}
+				</h1>
+				<p style={{ color: 'var(--admin-text-muted)', fontWeight: 500, marginTop: '8px' }}>
+					Monitoring PitHub network telemetry and activity logs.
+				</p>
+			</div>
+			{renderContent()}
+		</AdminDashboardLayout>
+	);
+};
+
+export default AdminDashboardPage;
