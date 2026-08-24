@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { reportService } from '../features/admin/services/adminService';
+import { reportService } from '../services/adminService';
 import InputModal from './InputModal';
 
 /**

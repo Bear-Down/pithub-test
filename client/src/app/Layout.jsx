@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import SearchBar from '../features/search/SearchBar';
+import SearchBar from '../components/SearchBar';
 import '../styles/style.css'; 
 import userIconFallback from '../assets/user-icon.jpg';
 import Spinner from '../components/Spinner';

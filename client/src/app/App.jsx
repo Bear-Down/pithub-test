@@ -3,19 +3,19 @@ import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-ro
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
 
-import ClassList from '../features/classes/ClassList';
-import ClassPage from '../features/classes/ClassPage';
-import LoginPage from '../features/auth/LoginPage';
-import LogoutPage from '../features/auth/LogoutPage';
-import ProfilePage from '../features/profile/ProfilePage';
+import ClassList from '../components/ClassList';
+import ClassPage from '../pages/classes/ClassPage';
+import LoginPage from '../pages/auth/LoginPage';
+import LogoutPage from '../pages/auth/LogoutPage';
+import ProfilePage from '../pages/profile/ProfilePage';
 import Layout from './Layout';
 import ProtectedRoute from '../components/ProtectedRoute';
-import AdminLoginPage from '../features/admin/pages/AdminLoginPage';
-import AdminDashboardPage from '../features/admin/pages/AdminDashboardPage';
-import { useAdminAuth } from '../features/admin/hooks/useAdminAuth';
+import AdminLoginPage from '../pages/admin/AdminLoginPage';
+import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
+import { useAdminAuth } from '../hooks/admin/useAdminAuth';
 
-import About from '../features/info/About';
-import Terms from '../features/info/Terms';
+import About from '../pages/info/About';
+import Terms from '../pages/info/Terms';
 
 import '../styles/style.css';
 
