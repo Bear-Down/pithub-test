@@ -76,3 +76,13 @@ Scrum Master:
 | RC-116 | As a user, I want to see view counts on videos and documents so that I can identify popular or useful academic resources. | 4 | 2 | N | -- | -- |
 | RC-117 | As a user, I want to bookmark notes and documents so that I can quickly revisit important study materials. | 5 | 2 | N | -- | -- |
 | RC-118 | As a developer, I want to separate moderation tools from regular user interfaces so that administrative functions remain secure and isolated. | 8 | 3 | Y | -- | -- |
+| RC-119 | As an developer, I want to be able to allow log ins with Lewis University Google gmails while running 'npm run dev' for testing | 10 | 6 | Y | -- | -- |
+| RC-120 | As a user, I want to have courtesy pop ups for when I switch my profile or classes to public/private | 7 | 2 | N | -- | -- |
+| RC-121 | As a user, I want a user-friendly and easy to navigate user interface with a modern design | 7 | 5 | N | -- | --
+| RC-122 | As a user, I want to be able to go to and manage my settings via a dedicated Settings page | 6 | 5 | N | -- | -- |
+| RC-123 | As a user, I would like the option to open videos directly on PitHub and not just be redirected to firebase storage | 4 | 3 | N | -- | -- | 
+| RC-124 | As a user, I want to be able change the view of my classes into either stacked tiles or gridded boxes | 3 | 4 | N |-- | -- |
+| RC-125 | As an administrator, I would like to see overall analytics for documents posted by users | 3 | 4 | Y | -- | -- |
+| RC-126 | As a user, I want to be able to see the number of views for my posts | 3 | 4 | N | -- | -- |
+| RC-127 | As an administrator, I want to improve the UI and functionalities of admin tools | 3 | 5 | Y | -- | -- |
+| RC-128 | As a developer, I want to fix the Search Bar component bug where classes aren't shown for the first search | 2 | 5 | N | -- | -- |
