@@ -64,6 +64,9 @@ export const useClassPage = () => {
     useEffect(() => {
         if (!classId) return;
 
+        setClassData(null);
+        setFiles([]);
+
         const docRef = doc(db, 'classes', classId);
         const unsubscribe = onSnapshot(docRef, (docSnap) => {
             if (docSnap.exists()) {
@@ -113,7 +116,7 @@ export const useClassPage = () => {
         });
 
         return () => unsubscribe();
-    }, [classId, isOwner]);
+    }, [classId, isOwner, classData === null]);
 
     const handleAddClick = () => {
         fileInputRef.current?.click();
