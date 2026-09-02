@@ -43,6 +43,7 @@ export const useProfileSettings = (userId) => {
             await batch.commit();
         } catch (error) {
             console.error("Error updating profile visibility:", error);
+            throw error;
         } finally {
             setIsGlobalLoading(false);
         }
