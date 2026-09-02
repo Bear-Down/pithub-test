@@ -48,9 +48,18 @@ service cloud.firestore {
                      request.auth.uid == resource.data.get('ownerId', '');
       
       allow create: if isSignedIn() && isNotSuspended();
-      allow update, delete: if isAdmin() || request.auth.uid == resource.data.get('ownerId', '');
-    }
+      allow update: if isAdmin() || 
+        request.auth.uid == resource.data.get('ownerId', '') ||
+        (
+          request.auth.uid == get(
+            /databases/$(database)/documents/classes/$(resource.data.get('classId', ''))
+          ).data.get('ownerId', '') &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visibility'])
+        );
 
+      allow delete: if isAdmin() || request.auth.uid == resource.data.get('ownerId', '');
+    }
+    
     // Reports Collection
     match /reports/{fileId} {
       allow read: if isAdmin();
