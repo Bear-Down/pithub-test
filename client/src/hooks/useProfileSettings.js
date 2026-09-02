@@ -22,41 +22,42 @@ export const useProfileSettings = (userId) => {
         await updateDoc(userRef, { visibility: newVisibility });
 
         // Step 2: If setting to private, update classes and files safely in chunks
-        if (newVisibility === 'private') {
-            const classesQuery = query(collection(db, 'classes'), where('ownerId', '==', userId));
-            const classSnaps = await getDocs(classesQuery);
-            
-            let batch = writeBatch(db);
-            let count = 0;
-
-            const commitBatch = async () => {
-                if (count > 0) {
-                    await batch.commit();
-                    batch = writeBatch(db);
-                    count = 0;
-                }
-            };
-
-            for (const classDoc of classSnaps.docs) {
-                batch.update(classDoc.ref, { visibility: 'private' });
-                count++;
-                if (count >= 300) await commitBatch();
-
-                const filesQuery = query(collection(db, 'files'), where('classId', '==', classDoc.id));
-                const fileSnaps = await getDocs(filesQuery);
+        // Requirement: If profile is private, all classes MUST be private
+            if (newVisibility === 'private') {
+                const classesQuery = query(collection(db, 'classes'), where('ownerId', '==', userId));
+                const classSnaps = await getDocs(classesQuery);
                 
-                for (const fileDoc of fileSnaps.docs) {
-                    batch.update(fileDoc.ref, { visibility: 'private' });
+                let count = 0;
+                const commitBatch = async () => {
+                    if (count > 0) {
+                        await batch.commit();
+                        batch = writeBatch(db);
+                        count = 0;
+                    }
+                };
+
+                for (const classDoc of classSnaps.docs) {
+                    batch.update(classDoc.ref, { visibility: 'private' });
                     count++;
                     if (count >= 300) await commitBatch();
+
+                    // Only update files owned by this user
+                    const filesQuery = query(
+                        collection(db, 'files'), 
+                        where('classId', '==', classDoc.id),
+                        where('ownerId', '==', userId)
+                    );
+                    const fileSnaps = await getDocs(filesQuery);
+                    
+                    for (const fileDoc of fileSnaps.docs) {
+                        batch.update(fileDoc.ref, { visibility: 'private' });
+                        count++;
+                        if (count >= 300) await commitBatch();
+                    }
                 }
             }
-
-            await commitBatch();
-        }
     } catch (error) {
         console.error("Profile privacy update failed:", error);
-        alert(`Privacy update failed: ${error.message}`);
     } finally {
         setIsGlobalLoading(false);
     }

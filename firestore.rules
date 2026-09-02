@@ -39,26 +39,22 @@ service cloud.firestore {
     }
 
     // Files Collection
-    match /files/{fileId} {
-      // Allow read if admin, or if public, or if owner. 
-      // Admin needs full read access to support collection counts and dashboard overview.
-      allow read: if isAdmin() || 
-                     resource.data.get('visibility', 'private') == 'public' || 
-                     request.auth.uid == resource.data.get('ownerId', '');
+      match /files/{fileId} {
+        allow read: if isAdmin() || 
+                      resource.data.get('visibility', 'private') == 'public' || 
+                      request.auth.uid == resource.data.get('ownerId', '');
       
-      allow create: if isSignedIn() && isNotSuspended();
-      allow update: if isAdmin() || 
-        (isSignedIn() && request.auth.uid == resource.data.get('ownerId', '')) ||
-        (
-          isSignedIn() &&
-          request.auth.uid == get(
-            /databases/$(database)/documents/classes/$(resource.data.get('classId', ''))
-       ).data.ownerId &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visibility'])
-      );
+        allow create: if isSignedIn() && isNotSuspended();
+        allow update: if isAdmin() || 
+          (isSignedIn() && request.auth.uid == resource.data.get('ownerId', '')) ||
+          (
+            isSignedIn() &&
+            request.auth.uid == get(/databases/$(database)/documents/classes/$(resource.data.get('classId', ''))).data.get('ownerId', '') &&
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visibility'])
+          );
 
-      allow delete: if isAdmin() || request.auth.uid == resource.data.get('ownerId', '');
-    }
+        allow delete: if isAdmin() || request.auth.uid == resource.data.get('ownerId', '');
+      }
     
     // Reports Collection
     match /reports/{fileId} {
