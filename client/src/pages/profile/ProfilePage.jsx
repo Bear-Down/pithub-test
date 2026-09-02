@@ -7,6 +7,7 @@ import ReportButton from '../../components/ReportButton';
 import { useProfilePage } from '../../hooks/useProfilePage';
 
 const ProfilePage = () => {
+	const [confirmPrivacyChange, setConfirmPrivacyChange] = React.useState(false);
 	const {
 		user,
 		profileData,
@@ -47,7 +48,7 @@ const ProfilePage = () => {
 				{isOwner && (
 					<div className="profile-visibility-toggle" style={{ marginLeft: 'auto' }}> {/* Added marginLeft: 'auto' for spacing */}
 						<button 
-							onClick={() => handleProfileVisibilityChange(profileData.visibility)}
+							onClick={() => setConfirmPrivacyChange(true)}
 							disabled={isGlobalLoading}
 							style={{ 
 								padding: '8px 16px', 
@@ -274,6 +275,22 @@ const ProfilePage = () => {
 					/>
 
 					<ConfirmationModal 
+						isOpen={confirmPrivacyChange}
+						title="Change Profile Privacy?"
+						message={
+							profileData.visibility === 'public'
+							? "Are you sure you want to make your profile private? Other users will no longer be able to view your public profile."
+							: "Are you sure you want to make your profile public? Other users will be able to view the information you've chosen to share."
+						}
+						confirmText="Yes, Change Privacy"
+						onConfirm={() => {
+							setConfirmPrivacyChange(false);
+							handleProfileVisibilityChange(profileData.visibility);
+						}}
+						onCancel={() => setConfirmPrivacyChange(false)}
+					/>
+
+					<ConfirmationModal
 						isOpen={!!confirmDelete}
 						title="Delete Class?"
 						message={
