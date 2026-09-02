@@ -25,9 +25,8 @@ service cloud.firestore {
     // Users Collection
     match /users/{userId} {
       allow read: if isSignedIn();
-      allow write: if request.auth.uid == userId && isNotSuspended();
-      // Allow owners to update themselves if not suspended, OR allow admins
-      allow update: if (request.auth.uid == userId && isNotSuspended()) || isAdmin();
+      allow write: if request.auth.uid == userId;
+      allow update: if request.auth.uid == userId || isAdmin();
     }
 
     // Classes Collection
@@ -49,13 +48,14 @@ service cloud.firestore {
       
       allow create: if isSignedIn() && isNotSuspended();
       allow update: if isAdmin() || 
-        request.auth.uid == resource.data.get('ownerId', '') ||
+        (isSignedIn() && request.auth.uid == resource.data.get('ownerId', '')) ||
         (
+          isSignedIn() &&
           request.auth.uid == get(
             /databases/$(database)/documents/classes/$(resource.data.get('classId', ''))
-          ).data.get('ownerId', '') &&
+       ).data.ownerId &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visibility'])
-        );
+      );
 
       allow delete: if isAdmin() || request.auth.uid == resource.data.get('ownerId', '');
     }
