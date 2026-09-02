@@ -266,8 +266,16 @@ export const useClassPage = () => {
      * This updates the class record and is used directly on the Class Page.
      */
     const handleToggleVisibility = async () => {
-        if (!classData || !user) return;
-        return await toggleGlobalVisibility(classData.visibility, classData.ownerId);
+        const currentVisibility = classData?.visibility || 'private';
+        const newVisibility = currentVisibility === 'public' ? 'private' : 'public';
+
+        const result = await toggleGlobalVisibility(currentVisibility, classData?.ownerId);
+
+        if (result?.error === 'PROFILE_PRIVATE') {
+            return { error: 'PROFILE_PRIVATE' };
+        }
+        setClassData(prev => ({ ...prev, visibility: newVisibility }));
+        return { success: true, newVisibility };
     };
 
     /**
