@@ -274,6 +274,9 @@ export const useClassPage = () => {
         if (result?.error === 'PROFILE_PRIVATE') {
             return { error: 'PROFILE_PRIVATE' };
         }
+        if (!result?.success) {
+            return { success: false, error: result?.error };
+        }
         setClassData(prev => ({ ...prev, visibility: newVisibility }));
         return { success: true, newVisibility };
     };

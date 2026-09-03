@@ -42,7 +42,8 @@ service cloud.firestore {
       match /files/{fileId} {
         allow read: if isAdmin() || 
                       resource.data.get('visibility', 'private') == 'public' || 
-                      request.auth.uid == resource.data.get('ownerId', '');
+                      request.auth.uid == resource.data.get('ownerId', '') ||
+                      request.auth.uid == get(/databases/$(database)/documents/classes/$(resource.data.get('classId', ''))).data.get('ownerId', '');
       
         allow create: if isSignedIn() && isNotSuspended();
         allow update: if isAdmin() || 

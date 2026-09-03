@@ -28,6 +28,7 @@ export const useProfileSettings = (userId) => {
                 const classSnaps = await getDocs(classesQuery);
                 
                 let count = 0;
+                let batch = writeBatch(db);
                 const commitBatch = async () => {
                     if (count > 0) {
                         await batch.commit();
@@ -55,6 +56,7 @@ export const useProfileSettings = (userId) => {
                         if (count >= 300) await commitBatch();
                     }
                 }
+                await commitBatch();
             }
     } catch (error) {
         console.error("Profile privacy update failed:", error);
