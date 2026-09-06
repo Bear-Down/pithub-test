@@ -144,7 +144,7 @@ Our team will:
 
 **Contribution Notes:**
 
-> Current contribution description:
+> Current contribution description: Frontend/backend development and feature implementation.
 
 ---
 
