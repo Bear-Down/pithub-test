@@ -35,7 +35,8 @@ const ClassPage = () => {
 	} = useClassPage();
 
 	const [showProfileWarning, setShowProfileWarning] = React.useState(false);
-
+	const [confirmClassPrivacyChange, setConfirmClassPrivacyChange] = React.useState(false);
+	
 	return (
 		<div className="container class-page">
 		{/* Hidden input to handle file selection */}
@@ -54,12 +55,7 @@ const ClassPage = () => {
 			{isOwner && (
 				<div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
 					<button 
-						onClick={async () => {
-							const result = await handleToggleVisibility();
-							if (result?.error === 'PROFILE_PRIVATE') {
-								setShowProfileWarning(true);
-							}
-						}} 
+						onClick= {() => setConfirmClassPrivacyChange(true)}
 						disabled={isGlobalLoading}
 						style={{ 
 							padding: '8px 16px', 
@@ -67,8 +63,8 @@ const ClassPage = () => {
 							borderRadius: '6px', 
 							border: '1px solid #ccc', 
 							fontWeight: 'bold',
-							backgroundColor: classData.visibility === 'public' ? '#28a745' : '#ff4d4d',
-							color: classData.visibility === 'public' ? '#ffffff' : 'var(--private-text)',
+							backgroundColor: classData?.visibility === 'public' ? '#28a745' : '#ff4d4d',
+							color: classData?.visibility === 'public' ? '#ffffff' : 'var(--private-text)',
 							cursor: 'pointer',
 							transition: 'background-color 0.3s ease, color 0.3s ease'
 						}}
@@ -298,6 +294,25 @@ const ClassPage = () => {
 			)}
 			</ul>
 		</section>
+
+		<ConfirmationModal
+		 isOpen={confirmClassPrivacyChange}
+		 title="Change Class Privacy?"
+		 message={
+			classData?.visibility === 'public'
+				? "Are you sure you want to make this class private? Others will no longer be able to access it."
+				: "Are you sure you want to make this class public? Others will be able to access it."
+		 }
+		 confirmText="Confirm"
+		 onConfirm={async () => {
+			setConfirmClassPrivacyChange(false);
+			const result = await handleToggleVisibility();
+			if (result?.error === 'PROFILE_PRIVATE') {
+				setShowProfileWarning(true);
+			}
+		 }}
+		 onCancel={() => setConfirmClassPrivacyChange(false)}
+		/>
 
 		<ConfirmationModal 
 			isOpen={showProfileWarning}
