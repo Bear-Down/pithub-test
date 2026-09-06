@@ -50,4 +50,30 @@ Each backlog item should contain:
 
 Our team refines backlog items as requirements change or become clearer.
 
----
+## 9. Definition of Ready and Done
+A backlog item is ready when:
+- Requirements are understood.
+- Acceptance criteria are available when needed.
+- Dependencies and blockers are identified.
+
+A backlog item is Done when:
+- The implementation is complete.
+- Acceptance criteria are satisfied.
+- Testing has been completed.
+- Documentation is updated when necessary.
+- Changes are integrated into the product.
+- A GitHub commit follows the format:
+
+Story [[STORY-NUMBER]] done
+
+
+## 10. Process Improvement
+Our team improves its development process through Sprint Retrospectives.
+
+Our team may adjust:
+- Sprint practices.
+- Communication methods.
+- Testing procedures.
+- GitHub workflow.
+- Documentation practices.
+- Process changes should be discussed by Our team and documented when adopted.
