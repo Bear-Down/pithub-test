@@ -54,5 +54,5 @@ PitHub is built on a **Serverless React Architecture**:
 
 ## Team & Scrum Documentation
 
-- [Team Documentation](TEAM.md)
-- [Scrum Process](PROCESS.md)
+- [Team Documentation](/docs/TEAM.md)
+- [Scrum Process](/docs/PROCESS.md)
