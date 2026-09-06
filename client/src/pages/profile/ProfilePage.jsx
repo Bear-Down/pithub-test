@@ -7,10 +7,14 @@ import ReportButton from '../../components/ReportButton';
 import { useProfilePage } from '../../hooks/useProfilePage';
 
 const ProfilePage = () => {
+	const [confirmPrivacyChange, setConfirmPrivacyChange] = React.useState(false);
 	const {
 		user,
 		profileData,
-		classes,
+		classes = [],
+		fileCounts = {},
+		viewMode = 'grid',
+		setViewMode,
 		recentFiles,
 		page,
 		setPage,
@@ -34,7 +38,7 @@ const ProfilePage = () => {
 		handleToggleFieldVisibility,
 		isGlobalLoading,
 		isFieldLoading
-	} = useProfilePage();
+	} = useProfilePage() || {};
 
 	return (
 		<div className="container profile-page">
@@ -47,7 +51,7 @@ const ProfilePage = () => {
 				{isOwner && (
 					<div className="profile-visibility-toggle" style={{ marginLeft: 'auto' }}> {/* Added marginLeft: 'auto' for spacing */}
 						<button 
-							onClick={() => handleProfileVisibilityChange(profileData.visibility)}
+							onClick={() => setConfirmPrivacyChange(true)}
 							disabled={isGlobalLoading}
 							style={{ 
 								padding: '8px 16px', 
@@ -238,14 +242,32 @@ const ProfilePage = () => {
 			</section>
 
 			<section style={{ marginTop: '40px', padding: '20px', backgroundColor: 'var(--bg-secondary)', borderRadius: '10px', border: '1px solid var(--section-border)' }}>
-				<div className="classes-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+				<div className="classes-header">
 					<h2>{isOwner ? 'Your Classes' : 'Classes'}</h2>
-					{isOwner && (
-						<button className="create-class-btn" onClick={handleCreateClass}>+ Create Class</button>
-					)}
+					<div className="classes-header-actions">
+						<div className="view-toggle-group">
+							<button 
+								className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+								onClick={() => setViewMode('grid')}
+								title="Grid View (Boxes)"
+							>
+								Grid
+							</button>
+							<button 
+								className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+								onClick={() => setViewMode('list')}
+								title="List View (Stacked)"
+							>
+								List
+							</button>
+						</div>
+						{isOwner && (
+							<button className="create-class-btn" onClick={handleCreateClass}>+ Create Class</button>
+						)}
+					</div>
 				</div>
 				{classes.length > 0 ? (
-					<div className="classes-horizontal-scroll">
+					<div className={viewMode === 'grid' ? 'classes-grid-view' : 'classes-list-view'}>
 						{classes.map((item) => (
 							<ClassCard 
 								key={item.id} 
@@ -253,6 +275,8 @@ const ProfilePage = () => {
 								onEdit={isOwner ? handleEditClass : null}
 								onDelete={isOwner ? (data) => setConfirmDelete(data) : null}
 								isOwner={isOwner}
+								viewMode={viewMode}
+								docCount={(fileCounts && item?.id && fileCounts[item.id]) || 0}
 							/>
 						))}
 					</div>
@@ -274,6 +298,22 @@ const ProfilePage = () => {
 					/>
 
 					<ConfirmationModal 
+						isOpen={confirmPrivacyChange}
+						title="Change Profile Privacy?"
+						message={
+							profileData.visibility === 'public'
+							? "Are you sure you want to make your profile private? Other users will no longer be able to view your public profile."
+							: "Are you sure you want to make your profile public? Other users will be able to view the information you've chosen to share."
+						}
+						confirmText="Yes, Change Privacy"
+						onConfirm={() => {
+							setConfirmPrivacyChange(false);
+							handleProfileVisibilityChange(profileData.visibility);
+						}}
+						onCancel={() => setConfirmPrivacyChange(false)}
+					/>
+
+					<ConfirmationModal
 						isOpen={!!confirmDelete}
 						title="Delete Class?"
 						message={
